@@ -783,7 +783,12 @@ def main(argv=None):
 
     expose = None
     if args.expose:
-        doc = json.load(open(args.expose))
+        try:
+            doc = json.load(open(args.expose))
+        except json.JSONDecodeError:
+            sys.exit("whatfiltered: %s is not valid JSON (is whatserved "
+                     "--json output empty? nothing was listening)"
+                     % args.expose)
         expose = doc.get("services", doc if isinstance(doc, list) else [])
 
     src_addr = None

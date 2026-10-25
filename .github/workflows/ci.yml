@@ -34,6 +34,10 @@ jobs:
       - name: companion integration with whatserved
         run: |
           git clone --depth 1 https://github.com/Kiwi172/whatserved ../whatserved
+          python3 -m http.server 8080 --bind 127.0.0.1 >/dev/null 2>&1 &
+          sleep 1
           sudo python3 ../whatserved/whatserved.py --json > served.json
+          kill %1
           sudo nft -j list ruleset > ruleset.json
           python3 whatfiltered.py -f ruleset.json --expose served.json
+          python3 -c "import json,sys; d=json.load(open('served.json')); sys.exit(0 if any(s.get('port')==8080 and s.get('listening') for s in d['services']) else 'our 8080 listener must appear in whatserved output')"
